@@ -3,10 +3,18 @@ using System.Collections;
 
 public class ScanBehaviour : MonoBehaviour {
 
-	private Transform gun;
+	public LayerMask layerMask;
+
+	private Transform gunT;
+	private Animator gunA;
+	private Transform camT;
+
+	private RaycastHit ray;
 
 	void Start() {
-		gun = GetComponentInChildren<Camera>().transform.FindChild("Gun").transform;
+		gunT = GetComponentInChildren<Camera>().transform.FindChild("Gun").transform;
+		gunA = GetComponentInChildren<Camera>().transform.FindChild("Gun").GetComponent<Animator>();
+		camT = GetComponentInChildren<Camera>().transform;
 		StartCoroutine(ScanInput());
 	}
 
@@ -20,12 +28,23 @@ public class ScanBehaviour : MonoBehaviour {
 	}
 
 	IEnumerator Scan() {
+		gunA.StopPlayback();
+		gunA.Play("GunCenter");
 		while (true) {
 			if (Input.GetAxis("Fire2") < 1) {
+				gunA.StopPlayback();
+				gunA.Play("GunReturn");
+				gunT.localRotation = Quaternion.identity;
 				break;
 			}
-			Debug.DrawRay(gun.position, gun.forward * 50, Color.green);
-			Physics.Raycast(gun.position, gun.forward, 50);
+
+			if (Physics.Raycast(camT.position, camT.forward, out ray, 10, layerMask)) {
+				Debug.DrawRay(camT.position, camT.forward * Vector3.Distance(ray.point,camT.position), Color.green);
+				gunT.LookAt(ray.point);
+				Debug.DrawRay(gunT.position, gunT.forward * Vector3.Distance(ray.point,gunT.position), Color.blue);
+			} else {
+				Debug.DrawRay(camT.position, camT.forward * 10, Color.red);
+			}
 
 			yield return null;
 		}
