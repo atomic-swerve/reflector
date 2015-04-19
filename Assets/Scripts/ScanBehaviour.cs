@@ -6,6 +6,13 @@ public class ScanBehaviour : MonoBehaviour {
 	public float scanLength = 10f;
 	public LayerMask layerMask;
 
+	public string programmingInput = "Fire1";
+	public string scanningInput = "Fire2";
+
+	public Color programmingColour = Color.magenta;
+	public Color scanningColour = Color.green;
+	public Color missingColour = Color.red;
+
 	private Transform gunT;
 	private Animator gunA;
 	private Transform camT;
@@ -26,37 +33,40 @@ public class ScanBehaviour : MonoBehaviour {
 
 	IEnumerator ScanInput() {
 		while (true) {
-			if (Input.GetAxis("Fire2") > 0f) {
-				yield return StartCoroutine(Scan ());
+			if (Input.GetAxis(programmingInput) > 0f) {
+				yield return StartCoroutine(Scan(programmingInput, programmingColour));
+			}
+			if (Input.GetAxis(scanningInput) > 0f) {
+				yield return StartCoroutine(Scan(scanningInput, scanningColour));
 			}
 			yield return null;
 		}
 	}
 
-	IEnumerator Scan() {
+	IEnumerator Scan(string programming, Color c) {
 		gunA.StopPlayback();
 		gunA.Play("GunCenter");
 		trail.enabled = true;
-		trail.SetColors(new Color(.7f,0,0,.3f),new Color(.7f,0,0,.2f));
+		trail.SetColors(c,c);
 		while (true) {
-			if (Input.GetAxis("Fire2") < 1) {
+			if (Input.GetAxis(programming) < 1) {
 				gunA.StopPlayback();
 				gunA.Play("GunReturn");
 				gunT.localRotation = Quaternion.identity;
 				trail.enabled = false;
 				break;
 			}
-
-			trail.SetPosition(0,laserT.position);
-
+			trail.
+				SetPosition(0,laserT.position);
+			
 			if (Physics.Raycast(camT.position, camT.forward, out ray, scanLength, layerMask)) {
 				gunT.rotation = Quaternion.RotateTowards(gunT.rotation, Quaternion.LookRotation((ray.point - gunT.position).normalized), 5f);
 				trail.SetPosition(1,ray.point);
-				trail.SetColors(new Color(.7f,0,0,.6f),new Color(.7f,0,0,.5f));
+				trail.SetColors(c,c);
 			} else {
 				gunT.localRotation = Quaternion.RotateTowards(gunT.localRotation, Quaternion.identity, 5f);
 				trail.SetPosition(1, laserT.position + laserT.up * scanLength);
-				trail.SetColors(new Color(.7f,0,0,.3f),new Color(.7f,0,0,.2f));
+				trail.SetColors(missingColour,missingColour);
 			}
 
 			yield return null;

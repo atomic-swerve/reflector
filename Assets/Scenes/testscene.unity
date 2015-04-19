@@ -866,6 +866,11 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 4294966783
+  programmingInput: Fire1
+  scanningInput: Fire2
+  programmingColour: {r: .725490212, g: 0, b: 1, a: .611764729}
+  scanningColour: {r: 0, g: .661764741, b: 0, a: .615686297}
+  missingColour: {r: 1, g: 0, b: 0, a: .250980407}
 --- !u!1 &1408639992
 GameObject:
   m_ObjectHideFlags: 0
